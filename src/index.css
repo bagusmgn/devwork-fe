@@ -35,7 +35,7 @@ h2 { margin: 0 0 8px; font-size: 16px; }
 .btn.danger { color: #991B1B; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 input, select, textarea { padding: 9px 12px; border: 1px solid #D1D5DB; border-radius: 8px; background: #fff; font-family: inherit; font-size: 14px; }
-.overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.5); display: grid; place-items: center; padding: 16px; }
+.overlay { position: fixed; inset: 0; z-index: 50; background: rgba(17, 24, 39, 0.5); display: grid; place-items: center; padding: 16px; }
 .modal { background: #fff; border-radius: 12px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow: auto; }
 .form { display: flex; flex-direction: column; gap: 12px; }
 .form label { display: flex; flex-direction: column; gap: 4px; font-weight: 500; }
@@ -133,7 +133,9 @@ html { -webkit-text-size-adjust: 100%; }
   .row, .focus-row { flex-wrap: wrap; }
   /* Modal menjadi bottom sheet */
   .overlay { place-items: end center; padding: 0; }
-  .modal { max-width: none; border-radius: 16px 16px 0 0; max-height: 92vh; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); }
+  .modal { max-width: none; border-radius: 16px 16px 0 0; max-height: 92vh; max-height: 92dvh; padding: 20px 16px 0; }
+  /* Tombol Batal/Simpan menempel di bawah sheet, selalu terlihat walau formnya panjang */
+  .modal .actions { position: sticky; bottom: 0; margin: 4px -16px 0; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--line); }
 }
 
 /* Layar sentuh: target sentuh 44 px, font 16 px agar iOS tidak zoom saat mengetik */
