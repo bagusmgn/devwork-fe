@@ -37,9 +37,11 @@ export default function TimeLog() {
       </header>
 
       {tasks.length === 0 ? (
-        <p className="muted">Buat task dulu di halaman Tasks sebelum mencatat waktu.</p>
+        <div className="empty-state">Buat task dulu di halaman Tasks sebelum mencatat waktu.</div>
       ) : (
-        <form className="card tl-form" onSubmit={submit}>
+        <section className="card">
+          <h2>Catat waktu</h2>
+          <form className="tl-form" onSubmit={submit}>
           <label>Task
             <select value={form.taskId} onChange={set('taskId')} required>
               <option value="" disabled>Pilih task</option>
@@ -49,17 +51,18 @@ export default function TimeLog() {
           <label>Tanggal
             <input type="date" value={form.date} onChange={set('date')} required />
           </label>
-          <label>Menit
-            <input type="number" min="1" step="1" value={form.minutes} onChange={set('minutes')} required />
+          <label>Durasi (menit)
+            <input type="number" min="1" step="1" placeholder="45" value={form.minutes} onChange={set('minutes')} required />
           </label>
-          <label>Catatan
-            <input value={form.note} onChange={set('note')} />
+          <label>Catatan (opsional)
+            <input placeholder="Apa yang dikerjakan?" value={form.note} onChange={set('note')} />
           </label>
           <button className="btn primary">Catat</button>
-        </form>
+          </form>
+        </section>
       )}
 
-      {dates.length === 0 && <p className="muted">Belum ada waktu yang dicatat.</p>}
+      {dates.length === 0 && <div className="empty-state">Belum ada waktu yang dicatat.</div>}
 
       {dates.map((d) => {
         const entries = byDate[d];
