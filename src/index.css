@@ -51,7 +51,9 @@ input, select, textarea { padding: 9px 12px; border: 1px solid #D1D5DB; border-r
 a.btn { display: inline-block; text-decoration: none; }
 .nowrap { white-space: nowrap; }
 .toolbar { display: flex; gap: 12px; flex-wrap: wrap; }
-.dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start; }
+.dash-grid { display: flex; gap: 17px; align-items: flex-start; }
+.dash-main { flex: 1 1 0; min-width: 0; max-width: fit-content; }
+.dash-side { flex: 1 1 0; min-width: 0; }
 .focus-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
 .focus-row .pills { margin-top: 6px; }
 .prog { margin-bottom: 16px; }
@@ -62,5 +64,18 @@ a.btn { display: inline-block; text-decoration: none; }
 .entry-right { display: flex; align-items: center; gap: 12px; }
 .clamp { white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 @media (max-width: 900px) {
-  .dash-grid, .tl-form { grid-template-columns: 1fr; }
+  .tl-form { grid-template-columns: 1fr; }
+  .dash-grid { flex-direction: column; align-items: stretch; }
 }
+
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+.card-head h2 { margin: 0; }
+.link { color: var(--accent); font-weight: 500; text-decoration: none; }
+.link:hover { text-decoration: underline; }
+.grow { flex: 1; min-width: 0; }
+.empty { margin: 8px 0 0; }
+.late { color: #991B1B; font-weight: 500; }
+.soon { color: #92400E; font-weight: 500; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.bar.done div { background: #047857; }
+.prog .small { display: block; margin-top: 4px; }
