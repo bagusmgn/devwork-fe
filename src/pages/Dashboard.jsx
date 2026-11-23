@@ -2,6 +2,16 @@ import { Link } from 'react-router-dom';
 import { useData } from '../store/DataContext';
 import { todayStr, addDays, weekRange, formatMinutes, formatLongDate, formatShort } from '../lib/date';
 
+const MAX_FOCUS = 5;
+const MAX_PROJECTS = 5;
+
+function DueLabel({ date, today }) {
+  if (!date) return <span className="muted small nowrap">Tanpa due date</span>;
+  if (date < today) return <span className="small nowrap late">Terlambat · {formatShort(date)}</span>;
+  if (date === today) return <span className="small nowrap soon">Hari ini</span>;
+  return <span className="muted small nowrap">Due {formatShort(date)}</span>;
+}
+
 export default function Dashboard() {
   const { tasks, projects, timeEntries } = useData();
   const today = todayStr();
@@ -21,10 +31,22 @@ export default function Dashboard() {
     ['Time this week', formatMinutes(weekMinutes)],
   ];
 
-  // Fokus hari ini: task yang sedang dikerjakan, due date terdekat dulu, tanpa due date di akhir.
+  // Fokus: task yang sedang dikerjakan, due date terdekat dulu, tanpa due date di akhir.
   const focus = [...inProgress]
     .sort((a, b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999'))
-    .slice(0, 5);
+    .slice(0, MAX_FOCUS);
+
+  // Progress: hanya proyek yang punya task, yang masih punya pekerjaan terbuka tampil lebih dulu.
+  const withTasks = projects
+    .map((p) => {
+      const mine = tasks.filter((t) => t.projectId === p.id);
+      const done = mine.filter((t) => t.status === 'done').length;
+      return { id: p.id, name: p.name, total: mine.length, done, open: mine.length - done };
+    })
+    .filter((p) => p.total > 0)
+    .sort((a, b) => b.open - a.open || a.name.localeCompare(b.name));
+  const shown = withTasks.slice(0, MAX_PROJECTS);
+  const hiddenCount = projects.length - shown.length;
 
   const projectName = (id) => projects.find((p) => p.id === id)?.name ?? 'Tanpa proyek';
 
@@ -48,40 +70,51 @@ export default function Dashboard() {
       </div>
 
       <div className="dash-grid">
-        <section className="card">
-          <h2>Fokus hari ini</h2>
-          {focus.length === 0 && <p className="muted">Tidak ada task yang sedang dikerjakan.</p>}
+        <section className="card dash-main">
+          <div className="card-head">
+            <h2>Fokus hari ini</h2>
+            <Link className="link" to="/tasks">Lihat semua</Link>
+          </div>
+          {focus.length === 0 && (
+            <p className="muted empty">Tidak ada task yang sedang dikerjakan. Pindahkan task ke In progress di halaman Tasks.</p>
+          )}
           {focus.map((t) => (
             <div className="focus-row" key={t.id}>
-              <div>
+              <div className="grow">
                 <div className="t-title">{t.title}</div>
                 <div className="pills">
                   <span className="pill prj">{projectName(t.projectId)}</span>
                   <span className={`pill ${t.priority.toLowerCase()}`}>{t.priority}</span>
                 </div>
               </div>
-              <div className="muted small nowrap">{t.dueDate ? `Due ${formatShort(t.dueDate)}` : 'Tanpa due date'}</div>
+              <DueLabel date={t.dueDate} today={today} />
             </div>
           ))}
         </section>
 
-        <section className="card">
-          <h2>Progress proyek</h2>
-          {projects.length === 0 && <p className="muted">Belum ada proyek.</p>}
-          {projects.map((p) => {
-            const mine = tasks.filter((t) => t.projectId === p.id);
-            const done = mine.filter((t) => t.status === 'done').length;
-            const pct = mine.length ? Math.round((done / mine.length) * 100) : 0;
+        <section className="card dash-side">
+          <div className="card-head">
+            <h2>Progress proyek</h2>
+            <Link className="link" to="/projects">Semua proyek</Link>
+          </div>
+          {projects.length === 0 && <p className="muted empty">Belum ada proyek.</p>}
+          {projects.length > 0 && shown.length === 0 && <p className="muted empty">Belum ada task di proyek mana pun.</p>}
+          {shown.map((p) => {
+            const pct = Math.round((p.done / p.total) * 100);
             return (
               <div className="prog" key={p.id}>
                 <div className="row">
-                  <strong>{p.name}</strong>
-                  <span className="muted">{done} dari {mine.length} selesai</span>
+                  <strong className="ellipsis">{p.name}</strong>
+                  <span className="muted small nowrap">{pct}%</span>
                 </div>
-                <div className="bar"><div style={{ width: `${pct}%` }} /></div>
+                <div className={pct === 100 ? 'bar done' : 'bar'}><div style={{ width: `${pct}%` }} /></div>
+                <div className="muted small">{p.done} dari {p.total} task selesai</div>
               </div>
             );
           })}
+          {hiddenCount > 0 && shown.length > 0 && (
+            <Link className="link small" to="/projects">+{hiddenCount} proyek lain</Link>
+          )}
         </section>
       </div>
     </>
