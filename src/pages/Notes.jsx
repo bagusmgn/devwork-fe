@@ -45,8 +45,8 @@ export default function Notes() {
       </header>
 
       <div className="toolbar">
-        <input aria-label="Cari note" placeholder="Cari note" value={query} onChange={(e) => setQuery(e.target.value)} style={{ width: 260 }} />
-        <select aria-label="Filter proyek" value={filter} onChange={(e) => setFilter(e.target.value)} style={{ width: 220 }}>
+        <input aria-label="Cari note" placeholder="Cari note" value={query} onChange={(e) => setQuery(e.target.value)} className="w-search" />
+        <select aria-label="Filter proyek" value={filter} onChange={(e) => setFilter(e.target.value)} className="w-filter">
           <option value="">Semua proyek</option>
           {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
