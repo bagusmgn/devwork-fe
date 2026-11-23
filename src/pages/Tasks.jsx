@@ -3,6 +3,7 @@ import { useData } from '../store/DataContext';
 import Modal from '../components/Modal';
 import { STATUSES, PRIORITIES } from '../lib/constants';
 import { formatShort } from '../lib/date';
+import { Edit2, Trash2 } from 'react-feather';
 
 const EMPTY = { title: '', description: '', projectId: '', status: 'backlog', priority: 'Medium', dueDate: '' };
 
@@ -93,13 +94,17 @@ export default function Tasks() {
                     <span className={`pill ${t.priority.toLowerCase()}`}>{t.priority}</span>
                   </div>
                   <div className="muted small">{t.dueDate ? `Due ${formatShort(t.dueDate)}` : 'Tanpa due date'}</div>
-                  <div className="row">
-                    <select aria-label="Ubah status" value={t.status} onChange={(e) => updateTask(t.id, { status: e.target.value })}>
+                  <div className="task-foot">
+                    <select className="status-select" aria-label="Ubah status" value={t.status} onChange={(e) => updateTask(t.id, { status: e.target.value })}>
                       {STATUSES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                     </select>
-                    <span>
-                      <button className="btn" onClick={() => openForm(t)}>Edit</button>{' '}
-                      <button className="btn danger" onClick={() => remove(t)}>Hapus</button>
+                    <span className="icon-actions">
+                      <button className="icon-btn" onClick={() => openForm(t)} aria-label={`Edit task ${t.title}`} title="Edit">
+                        <Edit2 size={16} aria-hidden="true" />
+                      </button>
+                      <button className="icon-btn danger" onClick={() => remove(t)} aria-label={`Hapus task ${t.title}`} title="Hapus">
+                        <Trash2 size={16} aria-hidden="true" />
+                      </button>
                     </span>
                   </div>
                 </article>
