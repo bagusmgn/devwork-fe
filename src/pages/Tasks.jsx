@@ -51,7 +51,7 @@ export default function Tasks() {
       {projects.length === 0 ? (
         <p className="muted">Buat proyek dulu di halaman Projects sebelum menambah task.</p>
       ) : (
-        <select aria-label="Filter proyek" value={filter} onChange={(e) => setFilter(e.target.value)} style={{ width: 220 }}>
+        <select aria-label="Filter proyek" value={filter} onChange={(e) => setFilter(e.target.value)} className="w-filter">
           <option value="">Semua proyek</option>
           {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
