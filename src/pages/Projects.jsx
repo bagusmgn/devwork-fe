@@ -24,7 +24,7 @@ export default function Projects() {
   };
 
   const remove = (p) => {
-    if (window.confirm(`Hapus proyek "${p.name}" beserta semua task-nya?`)) removeProject(p.id);
+    if (window.confirm(`Hapus proyek "${p.name}" beserta semua task dan note-nya?`)) removeProject(p.id);
   };
 
   return (

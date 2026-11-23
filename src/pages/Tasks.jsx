@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useData } from '../store/DataContext';
 import Modal from '../components/Modal';
 import { STATUSES, PRIORITIES } from '../lib/constants';
+import { formatShort } from '../lib/date';
 
 const EMPTY = { title: '', description: '', projectId: '', status: 'backlog', priority: 'Medium', dueDate: '' };
 
@@ -10,6 +11,7 @@ export default function Tasks() {
   const [filter, setFilter] = useState('');
   const [editing, setEditing] = useState(null); // null = tutup, {} = baru, objek task = edit
   const [form, setForm] = useState(EMPTY);
+  const [overCol, setOverCol] = useState(null); // kolom yang sedang disorot saat drag
 
   const projectName = (id) => projects.find((p) => p.id === id)?.name ?? 'Tanpa proyek';
   const visible = tasks.filter((t) => !filter || t.projectId === filter);
@@ -58,16 +60,39 @@ export default function Tasks() {
         {STATUSES.map((s) => {
           const items = visible.filter((t) => t.status === s.value);
           return (
-            <section className="col" key={s.value}>
+            <section
+              className={overCol === s.value ? 'col over' : 'col'}
+              key={s.value}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setOverCol(s.value);
+              }}
+              onDragLeave={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget)) setOverCol(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setOverCol(null);
+                const id = e.dataTransfer.getData('text/plain');
+                const task = tasks.find((x) => x.id === id);
+                if (task && task.status !== s.value) updateTask(id, { status: s.value });
+              }}
+            >
               <h2>{s.label} <span className="muted">{items.length}</span></h2>
               {items.map((t) => (
-                <article className="task" key={t.id}>
+                <article
+                  className="task"
+                  key={t.id}
+                  draggable
+                  onDragStart={(e) => e.dataTransfer.setData('text/plain', t.id)}
+                  onDragEnd={() => setOverCol(null)}
+                >
                   <div className="t-title">{t.title}</div>
                   <div className="pills">
                     <span className="pill prj">{projectName(t.projectId)}</span>
                     <span className={`pill ${t.priority.toLowerCase()}`}>{t.priority}</span>
                   </div>
-                  <div className="muted small">{t.dueDate ? `Due ${t.dueDate}` : 'Tanpa due date'}</div>
+                  <div className="muted small">{t.dueDate ? `Due ${formatShort(t.dueDate)}` : 'Tanpa due date'}</div>
                   <div className="row">
                     <select aria-label="Ubah status" value={t.status} onChange={(e) => updateTask(t.id, { status: e.target.value })}>
                       {STATUSES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}

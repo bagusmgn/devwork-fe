@@ -4,6 +4,8 @@ const links = [
   { to: '/', label: 'Dashboard', end: true },
   { to: '/tasks', label: 'Tasks' },
   { to: '/projects', label: 'Projects' },
+  { to: '/notes', label: 'Notes' },
+  { to: '/timelog', label: 'Time log' },
 ];
 
 export default function Layout() {

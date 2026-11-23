@@ -36,3 +36,5 @@ export function createRepository(entity) {
 
 export const projectRepo = createRepository('projects');
 export const taskRepo = createRepository('tasks');
+export const timeRepo = createRepository('timeEntries');
+export const noteRepo = createRepository('notes');

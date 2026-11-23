@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useReducer } from 'react';
-import { projectRepo, taskRepo } from '../services/repositories';
+import { projectRepo, taskRepo, timeRepo, noteRepo } from '../services/repositories';
 
 const DataContext = createContext(null);
 
@@ -36,24 +36,44 @@ export function DataProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, null, () => ({
     projects: projectRepo.list(),
     tasks: taskRepo.list(),
+    timeEntries: timeRepo.list(),
+    notes: noteRepo.list(),
   }));
 
   const value = useMemo(() => {
     const p = crud(dispatch, 'projects', projectRepo);
     const t = crud(dispatch, 'tasks', taskRepo);
+    const te = crud(dispatch, 'timeEntries', timeRepo);
+    const n = crud(dispatch, 'notes', noteRepo);
+
+    // Hapus data anak milik satu induk, di repository dan di state.
+    const cascade = (repo, entity, field, val) => {
+      repo.removeBy(field, val);
+      dispatch({ type: 'removeBy', entity, field, value: val });
+    };
+
     return {
       ...state,
       addProject: p.add,
       updateProject: p.update,
       removeProject: (id) => {
-        // Hapus proyek ikut menghapus task-nya.
-        taskRepo.removeBy('projectId', id);
-        dispatch({ type: 'removeBy', entity: 'tasks', field: 'projectId', value: id });
+        // Proyek dihapus: task, time entry milik task itu, dan note ikut dihapus.
+        state.tasks.filter((x) => x.projectId === id).forEach((x) => cascade(timeRepo, 'timeEntries', 'taskId', x.id));
+        cascade(taskRepo, 'tasks', 'projectId', id);
+        cascade(noteRepo, 'notes', 'projectId', id);
         p.remove(id);
       },
       addTask: t.add,
       updateTask: t.update,
-      removeTask: t.remove,
+      removeTask: (id) => {
+        cascade(timeRepo, 'timeEntries', 'taskId', id);
+        t.remove(id);
+      },
+      addTimeEntry: te.add,
+      removeTimeEntry: te.remove,
+      addNote: n.add,
+      updateNote: n.update,
+      removeNote: n.remove,
     };
   }, [state]);
 
